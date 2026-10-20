@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-extrabold text-navy-700 dark:text-white mb-5">Reports & Governance</h2>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Cost by Category</div>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-xs uppercase text-slate-400 tracking-wide">
+                    <th class="text-left px-5 py-2.5">Category</th>
+                    <th class="text-left px-5 py-2.5">Apps</th>
+                    <th class="text-right px-5 py-2.5">Annual Cost</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            {% for row in cost_by_category %}
+                <tr>
+                    <td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ row.category__name }}</td>
+                    <td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ row.count }}</td>
+                    <td class="px-5 py-2.5 text-right font-semibold text-navy-700 dark:text-white">₹{{ row.total|floatformat:0 }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="px-5 py-4 text-slate-400">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Deployments by Environment</div>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-xs uppercase text-slate-400 tracking-wide">
+                    <th class="text-left px-5 py-2.5">Environment</th>
+                    <th class="text-right px-5 py-2.5">Deployment Count</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+            {% for row in deployments_by_env %}
+                <tr>
+                    <td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ row.environment__name }}</td>
+                    <td class="px-5 py-2.5 text-right font-semibold text-navy-700 dark:text-white">{{ row.count }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="2" class="px-5 py-4 text-slate-400">No data.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Licenses Expiring Soon</div>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-700">
+            {% for lic in expiring_licenses %}
+            <li class="flex items-center justify-between px-5 py-3 text-sm">
+                <a href="{{ lic.application.get_absolute_url }}" class="text-accent-600 dark:text-accent-400 hover:underline">{{ lic.application.name }}</a>
+                <span class="{% if lic.is_expired %}text-red-600 dark:text-red-400 font-bold{% else %}text-navy-700 dark:text-slate-300{% endif %}">{{ lic.expiry_date|default:"No expiry" }}</span>
+            </li>
+            {% empty %}
+            <li class="px-5 py-4 text-slate-400 text-sm">No license data.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Applications Nearing End of Life</div>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-700">
+            {% for app in eol_apps %}
+            <li class="flex items-center justify-between px-5 py-3 text-sm">
+                <a href="{{ app.get_absolute_url }}" class="text-accent-600 dark:text-accent-400 hover:underline">{{ app.name }}</a>
+                <span class="text-orange-600 dark:text-orange-400 font-bold">{{ app.end_of_life_date }}</span>
+            </li>
+            {% empty %}
+            <li class="px-5 py-4 text-slate-400 text-sm">Nothing approaching end of life. Nice!</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

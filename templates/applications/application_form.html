@@ -1,0 +1,69 @@
+        {% extends "base.html" %}
+        {% load crispy_forms_tags %}
+        {% block title %}{% if object %}Edit{% else %}New{% endif %} Application{% endblock %}
+        {% block content %}
+        <div class="max-w-5xl mx-auto">
+            <header class="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-navy-700 via-navy-600 to-cyan-700 p-6 sm:p-8 shadow-card dark:from-[#101e35] dark:via-[#102b43] dark:to-[#123c4b] dark:shadow-card-dark">
+                <div class="absolute -right-10 -top-16 h-56 w-56 rounded-full bg-white/5"></div>
+                <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="max-w-2xl">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-100">
+                            <i class="bi bi-grid-3x3-gap-fill"></i>
+                            {% if object %}Application details{% else %}Application inventory{% endif %}
+                        </div>
+                        <h1 class="mt-4 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                            {% if object %}Edit {{ object.name }}{% else %}Register a new application{% endif %}
+                        </h1>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-200 sm:text-base">
+                            {% if object %}Keep application ownership, lifecycle, and cost information accurate and up to date.{% else %}Add the key details your team needs to understand, manage, and plan for this application.{% endif %}
+                        </p>
+                    </div>
+                    <div class="hidden h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-3xl text-cyan-100 sm:flex">
+                        <i class="bi bi-window-stack"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
+                <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card dark:border-slate-700 dark:bg-[#171d2b] dark:shadow-card-dark">
+                    <div class="border-b border-slate-100 px-5 py-4 dark:border-slate-700 sm:px-7">
+                        <h2 class="font-bold text-navy-700 dark:text-white">Application information</h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Complete the fields below. You can update these details later.</p>
+                    </div>
+                    <div class="p-5 sm:p-7">
+                    <form class="themed-form" method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-7 flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 dark:border-slate-700 sm:flex-row sm:items-center">
+                            <a href="{% url 'application-list' %}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-navy-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700">
+                                Cancel
+                            </a>
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg bg-navy-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 dark:focus:ring-offset-[#171d2b]">
+                                <i class="bi bi-check-lg"></i>
+                                {% if object %}Save changes{% else %}Register application{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                </section>
+
+                <aside class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card dark:border-slate-700 dark:bg-[#171d2b] dark:shadow-card-dark">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/10 text-accent-600 dark:text-accent-400">
+                        <i class="bi bi-lightbulb-fill text-lg"></i>
+                    </div>
+                    <h2 class="mt-4 font-bold text-navy-700 dark:text-white">A helpful tip</h2>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                        Start with a clear application name, category, and owner. Adding vendor, cost, and lifecycle dates makes reports more useful.
+                    </p>
+                    <div class="mt-5 border-t border-slate-100 pt-4 dark:border-slate-700">
+                        <p class="flex items-start gap-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            <i class="bi bi-shield-lock-fill mt-0.5 text-accent-600 dark:text-accent-400"></i>
+                            Your changes are saved to the inventory when you submit this form.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Vendors{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-extrabold text-navy-700 dark:text-white mb-5">Vendors</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for vendor in vendors %}
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark p-5">
+        <div class="flex items-start justify-between mb-1">
+            <h5 class="font-bold text-navy-700 dark:text-white">{{ vendor.name }}</h5>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-navy-700 dark:bg-white/10 text-white dark:text-slate-200 shrink-0 ml-2">{{ vendor.app_count }} apps</span>
+        </div>
+        <div class="text-sm text-slate-500 dark:text-slate-400 mb-3">{{ vendor.account_manager|default:"No account manager on file" }}</div>
+        <div class="space-y-1 text-sm text-navy-700 dark:text-slate-300">
+            {% if vendor.support_email %}<div><i class="bi bi-envelope text-slate-400"></i> {{ vendor.support_email }}</div>{% endif %}
+            {% if vendor.support_phone %}<div><i class="bi bi-telephone text-slate-400"></i> {{ vendor.support_phone }}</div>{% endif %}
+            {% if vendor.website %}<div><a href="{{ vendor.website }}" target="_blank" class="text-accent-600 dark:text-accent-400 hover:underline"><i class="bi bi-globe"></i> Website</a></div>{% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="md:col-span-3">
+        <div class="rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 text-sm px-4 py-3">No vendors yet.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

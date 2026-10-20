@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Application Inventory System{% endblock %}</title>
+
+    <script>
+        // Apply saved theme before first paint to avoid a flash of the wrong theme.
+        (function () {
+            const saved = localStorage.getItem("theme");
+            const isDark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (isDark) document.documentElement.classList.add("dark");
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+                    colors: {
+                        navy: {
+                            50: "#eef2f8", 100: "#dbe4f0", 400: "#5b7aa6",
+                            600: "#14294d", 700: "#0b1f3a", 800: "#081729", 900: "#050f1c",
+                        },
+                        accent: { 400: "#22b8cf", 500: "#17a2b8", 600: "#13818f" },
+                    },
+                    boxShadow: {
+                        card: "0 4px 18px rgba(11, 31, 58, 0.06)",
+                        "card-hover": "0 10px 25px rgba(11, 31, 58, 0.12)",
+                        "card-dark": "0 4px 18px rgba(0, 0, 0, 0.35)",
+                        "card-dark-hover": "0 10px 25px rgba(0, 0, 0, 0.5)",
+                    },
+                },
+            },
+        };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Smooth theme transitions app-wide */
+        * { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
+        ::placeholder { color: #9aa4bd; }
+
+        .themed-form { color: #0b1f3a; }
+        .dark .themed-form { color: #e2e8f0; }
+        .themed-form label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #334155;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .dark .themed-form label { color: #cbd5e1; }
+        .themed-form input:not([type="checkbox"]):not([type="radio"]),
+        .themed-form select,
+        .themed-form textarea {
+            width: 100%;
+            min-height: 2.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.625rem;
+            background-color: #fff;
+            padding: 0.65rem 0.8rem;
+            color: #0b1f3a;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
+        }
+        .themed-form textarea { min-height: 7rem; resize: vertical; }
+        .dark .themed-form input:not([type="checkbox"]):not([type="radio"]),
+        .dark .themed-form select,
+        .dark .themed-form textarea {
+            border-color: #475569;
+            background-color: #111827;
+            color: #f1f5f9;
+            color-scheme: dark;
+        }
+        .themed-form input::placeholder,
+        .themed-form textarea::placeholder { color: #94a3b8; }
+        .themed-form input:focus,
+        .themed-form select:focus,
+        .themed-form textarea:focus {
+            border-color: #17a2b8;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgb(23 162 184 / 18%);
+        }
+        .themed-form input[type="checkbox"],
+        .themed-form input[type="radio"] {
+            height: 1rem;
+            width: 1rem;
+            accent-color: #13818f;
+        }
+        .themed-form .helptext,
+        .themed-form p.help-block,
+        .themed-form .form-text {
+            display: block;
+            margin-top: 0.35rem;
+            color: #64748b;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+        .dark .themed-form .helptext,
+        .dark .themed-form p.help-block,
+        .dark .themed-form .form-text { color: #94a3b8; }
+        .themed-form ul.errorlist {
+            margin: 0.35rem 0 0;
+            padding: 0;
+            color: #dc2626;
+            font-size: 0.8rem;
+            list-style: none;
+        }
+        .dark .themed-form ul.errorlist { color: #fca5a5; }
+        .themed-form .mb-3,
+        .themed-form .mb-4 { margin-bottom: 1.2rem; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-slate-100 dark:bg-[#0f1420] text-navy-700 dark:text-slate-100 font-sans min-h-screen flex flex-col">
+
+<nav class="sticky top-0 z-40 bg-gradient-to-r from-navy-700 to-navy-600 dark:from-[#0b1220] dark:to-[#0e1626] shadow-lg">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+            <a href="{% url 'dashboard' %}" class="flex items-center gap-2 text-white font-extrabold text-lg tracking-tight">
+                <i class="bi bi-diagram-3-fill text-accent-400"></i> Inventory<span class="text-accent-400">HQ</span>
+            </a>
+
+            <div class="hidden lg:flex items-center gap-1">
+                <a href="{% url 'dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'dashboard' %}bg-white/10 text-white{% else %}text-slate-200 hover:bg-white/10 hover:text-white{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="{% url 'application-list' %}" class="px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'application-list' %}bg-white/10 text-white{% else %}text-slate-200 hover:bg-white/10 hover:text-white{% endif %}">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> Applications
+                    <span class="ml-1 inline-flex items-center justify-center rounded-full bg-white/90 text-navy-700 text-xs font-bold px-2 py-0.5">{{ nav_total_apps }}</span>
+                </a>
+                <a href="{% url 'vendor-list' %}" class="px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'vendor-list' %}bg-white/10 text-white{% else %}text-slate-200 hover:bg-white/10 hover:text-white{% endif %}">
+                    <i class="bi bi-building"></i> Vendors
+                </a>
+                <a href="{% url 'reports' %}" class="px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'reports' %}bg-white/10 text-white{% else %}text-slate-200 hover:bg-white/10 hover:text-white{% endif %}">
+                    <i class="bi bi-bar-chart-line-fill"></i> Reports
+                </a>
+                <a href="/api/" class="px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white">
+                    <i class="bi bi-plug-fill"></i> API
+                </a>
+                <a href="/admin/" class="px-3 py-2 rounded-md text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white">
+                    <i class="bi bi-gear-fill"></i> Admin
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                {% if nav_critical_apps %}
+                <span class="hidden sm:inline-flex items-center gap-1 rounded-full bg-red-500/90 text-white text-xs font-semibold px-2.5 py-1">
+                    <i class="bi bi-exclamation-triangle-fill"></i> {{ nav_critical_apps }} Critical
+                </span>
+                {% endif %}
+
+                <button id="themeToggle" type="button" title="Toggle dark mode"
+                        class="w-9 h-9 flex items-center justify-center rounded-md text-slate-200 hover:bg-white/10 hover:text-white">
+                    <i class="bi bi-moon-stars-fill" id="themeIconDark"></i>
+                    <i class="bi bi-sun-fill hidden" id="themeIconLight"></i>
+                </button>
+
+                {% if user.is_authenticated %}
+                    <span class="hidden md:inline text-slate-300 text-sm mr-1">Hi, {{ user.username }}</span>
+                    <a href="{% url 'application-add' %}" class="inline-flex items-center gap-1 rounded-md bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-3 py-2">
+                        <i class="bi bi-plus-lg"></i> <span class="hidden sm:inline">New App</span>
+                    </a>
+                    <form action="{% url 'logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button class="rounded-md border border-white/30 text-slate-200 hover:bg-white/10 hover:text-white text-sm font-medium px-3 py-2" type="submit">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="rounded-md border border-white/30 text-slate-200 hover:bg-white/10 hover:text-white text-sm font-medium px-3 py-2">Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mobile nav -->
+        <div class="lg:hidden flex flex-wrap gap-1 pb-3">
+            <a href="{% url 'dashboard' %}" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">Dashboard</a>
+            <a href="{% url 'application-list' %}" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">Applications</a>
+            <a href="{% url 'vendor-list' %}" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">Vendors</a>
+            <a href="{% url 'reports' %}" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">Reports</a>
+            <a href="/api/" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">API</a>
+            <a href="/admin/" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-200 hover:bg-white/10 hover:text-white">Admin</a>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-1 max-w-screen-2xl w-full mx-auto px-4 sm:px-6 py-6">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 rounded-lg border px-4 py-3 text-sm font-medium flex items-center justify-between
+                {% if message.tags == 'success' %} bg-green-50 border-green-200 text-green-800 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300
+                {% elif message.tags == 'error' or message.tags == 'danger' %} bg-red-50 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300
+                {% else %} bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300 {% endif %}">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="text-center text-xs text-slate-500 dark:text-slate-500 py-6">
+    Application Inventory System &mdash; Django + PostgreSQL &middot; Internal IT Asset Management
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const root = document.documentElement;
+        const toggleBtn = document.getElementById("themeToggle");
+        const iconDark = document.getElementById("themeIconDark");
+        const iconLight = document.getElementById("themeIconLight");
+
+        function syncIcon() {
+            const isDark = root.classList.contains("dark");
+            iconDark.classList.toggle("hidden", isDark);
+            iconLight.classList.toggle("hidden", !isDark);
+        }
+        syncIcon();
+
+        toggleBtn.addEventListener("click", function () {
+            root.classList.toggle("dark");
+            localStorage.setItem("theme", root.classList.contains("dark") ? "dark" : "light");
+            syncIcon();
+        });
+    })();
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

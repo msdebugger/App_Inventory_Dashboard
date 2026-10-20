@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}{{ application.name }} - Application Detail{% endblock %}
+{% block content %}
+
+<nav class="text-sm mb-3">
+    <a href="{% url 'application-list' %}" class="text-accent-600 dark:text-accent-400 hover:underline">Applications</a>
+    <span class="text-slate-400 mx-1">/</span>
+    <span class="text-slate-500 dark:text-slate-400">{{ application.name }}</span>
+</nav>
+
+<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-6">
+    <div>
+        <h2 class="text-2xl font-extrabold text-navy-700 dark:text-white flex flex-wrap items-center gap-2">
+            {{ application.name }}
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white
+                {% if application.status == 'ACTIVE' %} bg-green-600
+                {% elif application.status == 'PLANNED' %} bg-slate-500
+                {% elif application.status == 'DEPRECATED' %} bg-orange-500
+                {% elif application.status == 'RETIRED' %} bg-red-600
+                {% else %} bg-cyan-500 {% endif %}">
+                {{ application.get_status_display }}
+            </span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full
+                {% if application.criticality == 'LOW' %} bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400
+                {% elif application.criticality == 'MEDIUM' %} bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400
+                {% elif application.criticality == 'HIGH' %} bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400
+                {% else %} bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400 {% endif %}">
+                {{ application.get_criticality_display }} Criticality
+            </span>
+        </h2>
+        <p class="text-slate-500 dark:text-slate-400 mt-1">{{ application.description|default:"No description provided." }}</p>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="flex gap-2 shrink-0">
+        <a href="{% url 'application-edit' application.slug %}" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-600 text-navy-700 dark:text-slate-200 text-sm font-semibold px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'application-delete' application.slug %}" class="inline-flex items-center gap-1 rounded-lg border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark p-4">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Category</div>
+        <div class="font-semibold text-navy-700 dark:text-white mt-1">{{ application.category.name }}</div>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark p-4">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Vendor</div>
+        <div class="font-semibold text-navy-700 dark:text-white mt-1">{{ application.vendor.name|default:"—" }}</div>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark p-4">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Department</div>
+        <div class="font-semibold text-navy-700 dark:text-white mt-1">{{ application.department.name|default:"—" }}</div>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark p-4">
+        <div class="text-xs text-slate-400 uppercase font-semibold">Annual Cost</div>
+        <div class="font-semibold text-green-600 dark:text-green-400 mt-1">₹{{ application.annual_cost|floatformat:0 }}</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div>
+        <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark mb-4 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Details</div>
+            <table class="w-full text-sm">
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5 w-2/5">Version</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.version|default:"—" }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Type</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.get_application_type_display }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Hosting</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.get_hosting_type_display }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Data Classification</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.get_data_classification_display }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Uptime SLA</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.uptime_sla }}%</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Owner</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.owner_name|default:"—" }} {% if application.owner_email %}&lt;{{ application.owner_email }}&gt;{% endif %}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Technical Contact</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.technical_contact|default:"—" }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Launch Date</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">{{ application.launch_date|default:"—" }}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">End of Life</th><td class="px-5 py-2.5 text-navy-700 dark:text-slate-200">
+                        {{ application.end_of_life_date|default:"—" }}
+                        {% if application.is_end_of_life_soon %}<span class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-400">Ending soon</span>{% endif %}
+                    </td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">URL</th><td class="px-5 py-2.5">{% if application.url %}<a href="{{ application.url }}" target="_blank" class="text-accent-600 dark:text-accent-400 hover:underline">{{ application.url }}</a>{% else %}<span class="text-navy-700 dark:text-slate-200">—</span>{% endif %}</td></tr>
+                    <tr><th class="text-left font-semibold text-slate-500 dark:text-slate-400 px-5 py-2.5">Repository</th><td class="px-5 py-2.5">{% if application.repository_url %}<a href="{{ application.repository_url }}" target="_blank" class="text-accent-600 dark:text-accent-400 hover:underline">{{ application.repository_url }}</a>{% else %}<span class="text-navy-700 dark:text-slate-200">—</span>{% endif %}</td></tr>
+                </tbody>
+            </table>
+            {% if application.tags.all %}
+            <div class="px-5 pb-4 pt-2 flex flex-wrap gap-1.5">
+                {% for tag in application.tags.all %}
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-navy-50 dark:bg-white/5 text-navy-700 dark:text-slate-300">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark mb-4 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <span class="font-bold text-navy-700 dark:text-white">Deployments</span>
+                {% if user.is_authenticated %}<a href="{% url 'deployment-add' application.slug %}" class="text-xs font-semibold rounded-md border border-slate-300 dark:border-slate-600 text-navy-700 dark:text-slate-200 px-2.5 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700"><i class="bi bi-plus"></i> Add</a>{% endif %}
+            </div>
+            <ul class="divide-y divide-slate-100 dark:divide-slate-700">
+                {% for d in application.deployments.all %}
+                <li class="px-5 py-3">
+                    <div class="flex items-center justify-between">
+                        <strong class="text-navy-700 dark:text-slate-100">{{ d.environment }}</strong>
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full {% if d.is_active %}bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400{% else %}bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400{% endif %}">
+                            {% if d.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ d.server_name }} &middot; {{ d.ip_address|default:"no IP" }} &middot; {{ d.operating_system|default:"—" }} &middot; {{ d.region|default:"—" }}</div>
+                </li>
+                {% empty %}
+                <li class="px-5 py-4 text-slate-400 text-sm">No deployments recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <span class="font-bold text-navy-700 dark:text-white">Licenses</span>
+                {% if user.is_authenticated %}<a href="{% url 'license-add' application.slug %}" class="text-xs font-semibold rounded-md border border-slate-300 dark:border-slate-600 text-navy-700 dark:text-slate-200 px-2.5 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700"><i class="bi bi-plus"></i> Add</a>{% endif %}
+            </div>
+            <ul class="divide-y divide-slate-100 dark:divide-slate-700">
+                {% for lic in application.licenses.all %}
+                <li class="px-5 py-3">
+                    <div class="flex items-center justify-between">
+                        <strong class="text-navy-700 dark:text-slate-100">{{ lic.get_license_type_display }}</strong>
+                        <span class="text-sm text-slate-500 dark:text-slate-400">{{ lic.seats_used }}/{{ lic.seats_purchased }} seats</span>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Expires {{ lic.expiry_date|default:"—" }}
+                        {% if lic.is_expired %}<span class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400">Expired</span>{% endif %}
+                        &middot; ₹{{ lic.cost|floatformat:0 }}
+                    </div>
+                </li>
+                {% empty %}
+                <li class="px-5 py-4 text-slate-400 text-sm">No licenses recorded.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="rounded-2xl bg-white dark:bg-[#171d2b] shadow-card dark:shadow-card-dark mt-4 overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-navy-700 dark:text-white">Audit Trail</div>
+    <ul class="divide-y divide-slate-100 dark:divide-slate-700">
+        {% for entry in application.audit_entries.all %}
+        <li class="px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <span class="text-sm text-navy-700 dark:text-slate-200"><strong>{{ entry.get_action_display }}</strong> {{ entry.notes }}</span>
+            <span class="text-xs text-slate-400">{{ entry.actor|default:"system" }} &middot; {{ entry.created_at|date:"M d, Y H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="px-5 py-4 text-slate-400 text-sm">No audit history yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
