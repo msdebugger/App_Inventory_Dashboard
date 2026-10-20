@@ -1,18 +1,37 @@
+# Python bytecode and virtual environments
 __pycache__/
 *.py[cod]
 *$py.class
-*.sqlite3
-db.sqlite3
-.env
-.venv/
 venv/
+.venv/
 env/
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Local database and generated uploads/static files
+*.sqlite3
+*.sqlite3-journal
 staticfiles/
 media/
+
+# Test, type-checker, and application output
 *.log
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Operating system and IDE files
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
+
+# Build artifacts
 *.egg-info/
 build/
 dist/
